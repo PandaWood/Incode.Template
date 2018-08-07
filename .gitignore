@@ -1,0 +1,15 @@
+*.[Cc]ache
+[Bb]in/
+[Oo]bj/
+*.[Uu]ser
+_ReSharper.*/
+*.suo
+NuGet/
+*.fb7lck
+*.fbl7
+*.fbpInf
+Binaries/
+*.bak
+[Hh]elp/
+packages
+.vs/

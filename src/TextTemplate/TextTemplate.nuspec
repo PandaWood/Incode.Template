@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <id>TextTemplate</id>
+    <title>TextTemplate</title>
+    <authors>Lasse V. Karlsen</authors>
+    <owners>Lasse V. Karlsen</owners>
+    <licenseUrl>http://texttemplate.codeplex.com/license</licenseUrl>
+    <projectUrl>http://texttemplate.codeplex.com</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <language>en-US</language>
+    <description>Text template system for .NET 3.5 and 4.0 written in C#.</description>
+    <summary>A class library that allows executable text templates, with code written in C# and VB.NET, to be compiled and executed, to produce text with.</summary>
+    <tags>C# VB.NET Template Text</tags>
+    </metadata>
+</package>

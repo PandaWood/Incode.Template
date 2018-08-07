@@ -1,0 +1,39 @@
+<%@ using System.CodeDom.Compiler %>
+<html>
+    <head>
+        <title>500 Server Error - <%= Exception.Message %></title>
+    </head>
+    <html>
+        <h1>500 Server Error - <%= Exception.Message %></h1>
+
+<%
+    while (Exception != null)
+    {
+%>
+        <pre>
+            <%= Exception.StackTrace %>
+        </pre>
+<%
+        if (Exception is TemplateCompilerException)
+        {
+%>
+        <pre>
+<%
+            foreach (CompilerError error in ((TemplateCompilerException)Exception).Errors)
+            {
+%>
+<%= error.ErrorNumber %> @ <%= error.FileName %>#<%= error.Line %>,<%= error.Column %>: <%= error.ErrorText %>
+<%
+            }
+%>
+        </pre>
+<%
+        
+        }
+%>
+<%
+        Exception = Exception.InnerException;
+    }
+%>
+    </html>
+</html>

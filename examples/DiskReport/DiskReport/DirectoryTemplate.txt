@@ -1,0 +1,142 @@
+﻿<%@ using System.IO %>
+<%
+    var directory = new DirectoryInfo(Path);
+%>
+<html>
+    <head>
+        <style>
+            thead
+            {
+                background-color: #cccccc;
+                font-weight: bolder;
+            }
+
+            .NameColumn
+            {
+                text-align: left;
+                padding-right: 20px;
+            }
+
+            .FileSizeColumn
+            {
+                text-align: right;
+                padding-left: 20px;
+            }
+
+            .DateColumn
+            {
+                text-align: right;
+                padding-left: 20px;
+            }
+
+            .AttributeColumn
+            {
+                text-align: center;
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+        </style>
+        <title><%= Path %></title>
+    </head>
+    <body>
+        <h1>
+            <%
+            string[] parts = Path.Split(System.IO.Path.DirectorySeparatorChar);
+            bool first = true;
+            var sb = new StringBuilder();
+            foreach (var part in parts)
+            {
+                if (!first)
+                {
+                    %><%= System.IO.Path.DirectorySeparatorChar %><%
+                    sb.Append(System.IO.Path.DirectorySeparatorChar);
+                }
+                sb.Append(part);
+                var fileName = Report.GetFileForPath(sb.ToString());
+                if (fileName != null)
+                {
+                    %><a href="<%= fileName %>"><%
+                }
+%><%= part %><%
+                if (fileName != null)
+                {
+                    %></a><%
+                }
+                first = false;
+            }
+%>
+
+
+        </h1>
+
+        <table>
+            <thead>
+                <th class="NameColumn">Filename</th>
+                <th class="FileSizeColumn">Size</th>
+                <th class="AttributeColumn">Attributes</th>
+                <th class="DateColumn">Creation time</th>
+                <th class="DateColumn">Last write-time</th>
+                <th class="DateColumn">Last access-time</th>
+            </thead>
+            <tbody>
+<%
+            foreach (var subDir in directory.GetDirectories())
+            {
+                var fileName = Report.AddPathToReport(subDir.FullName);
+%>
+                <tr>
+                    <td class="FileNameColumn"><a href="<%= fileName %>"><%= subDir.Name %></a></td>
+                    <td class="FileSizeColumn">DIRECTORY</td>
+                    <td class="AttributeColumn"><pre><%= AttributesToString(subDir.Attributes) %></pre></td>
+                    <td class="DateColumn"><%= subDir.CreationTime.ToString("g") %></td>
+                    <td class="DateColumn"><%= subDir.LastWriteTime.ToString("g") %></td>
+                    <td class="DateColumn"><%= subDir.LastAccessTime.ToString("g") %></td>
+                </tr>
+<%
+            }
+            foreach (var file in directory.GetFiles())
+            {
+%>
+                <tr>
+                    <td class="FileNameColumn"><a href="<%= file.FullName %>"><%= file.Name %></a></td>
+                    <td class="FileSizeColumn"><%= file.Length.ToString("#,##0") %></td>
+                    <td class="AttributeColumn"><pre><%= AttributesToString(file.Attributes) %></pre></td>
+                    <td class="DateColumn"><%= file.CreationTime.ToString("g") %></td>
+                    <td class="DateColumn"><%= file.LastWriteTime.ToString("g") %></td>
+                    <td class="DateColumn"><%= file.LastAccessTime.ToString("g") %></td>
+                </tr>
+<%
+            }
+%>
+            </tbody>
+        </table>
+    </body>
+</html>
+<%+
+public string AttributesToString(FileAttributes attr)
+{
+    StringBuilder sb = new StringBuilder();
+
+    if ((attr & FileAttributes.ReadOnly) != 0)
+        sb.Append("R");
+    else
+        sb.Append(".");
+
+    if ((attr & FileAttributes.Hidden) != 0)
+        sb.Append("H");
+    else
+        sb.Append(".");
+
+    if ((attr & FileAttributes.System) != 0)
+        sb.Append("S");
+    else
+        sb.Append(".");
+
+    if ((attr & FileAttributes.Archive) != 0)
+        sb.Append("A");
+    else
+        sb.Append(".");
+
+    return sb.ToString();
+}
+%>
