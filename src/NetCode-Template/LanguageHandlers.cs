@@ -11,7 +11,7 @@ namespace NetCodeT
 		/// <summary>
 		///   This dictionary holds registered languages and their handler types.
 		/// </summary>
-		private static readonly Dictionary<string, Type> _RegisteredHandlers = new Dictionary<string, Type>
+		private static readonly Dictionary<string, Type> _registeredHandlers = new Dictionary<string, Type>
 		{
 			{ "C#v3.5", typeof(CSharpTemplateHandler) },
 			{ "C#v4.0", typeof(CSharpTemplateHandler) },
@@ -27,7 +27,7 @@ namespace NetCodeT
 		/// </returns>
 		public static Dictionary<string, Type> GetRegisteredHandlers()
 		{
-			return _RegisteredHandlers;
+			return _registeredHandlers;
 		}
 
 		/// <summary>
@@ -62,7 +62,7 @@ namespace NetCodeT
 			if (handlerType.IsGenericType || handlerType.IsAbstract)
 				throw new ArgumentException("The specified handlerType is generic, or abstract");
 
-			_RegisteredHandlers[language] = handlerType;
+			_registeredHandlers[language] = handlerType;
 		}
 	}
 }

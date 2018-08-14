@@ -46,11 +46,14 @@ namespace NetCodeT
 		/// <returns>
 		///   The generated code.
 		/// </returns>
-		protected override string GenerateCode(IEnumerable<string> namespaceImports, IEnumerable<string> codeParts, Type parameterType, string parameterName)
+		protected override string GenerateCode(IEnumerable<string> namespaceImports, IEnumerable<string> codeParts, 
+			Type parameterType, string parameterName)
 		{
 			var code = new StringBuilder();
 			foreach (var usingDirective in namespaceImports)
+			{
 				code.AppendFormat("using {0};{1}", usingDirective, NewLine);
+			}
 
 			code.Append(NewLine);
 			code.Append("namespace GeneratedNetCodeTemplateNamespace" + NewLine);
@@ -60,24 +63,27 @@ namespace NetCodeT
 			code.Append("        private global::System.Text.StringBuilder _GeneratedTemplateOutput = new global::System.Text.StringBuilder();" + NewLine);
 			if (parameterName.Length > 0)
 			{
-				code.Append("        public global::System.String ExecuteTemplateCode(" + TypeHelper.TypeToString(parameterType, true) + " " + parameterName + ")" + NewLine);
+				code.Append("        public global::System.String ExecuteTemplateCode(" + 
+				            TypeHelper.TypeToString(parameterType, true) + " " + parameterName + ")" + NewLine);
 				code.Append("        {" + NewLine);
 			}
 			else
 			{
-				code.Append("        public global::System.String ExecuteTemplateCode(" + TypeHelper.TypeToString(parameterType, true) + " templateState)" + NewLine);
+				code.Append("        public global::System.String ExecuteTemplateCode(" + 
+				            TypeHelper.TypeToString(parameterType, true) + " templateState)" + NewLine);
 				code.Append("        {" + NewLine);
 				foreach (var property in parameterType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
 					if (property.CanRead)
 						code.AppendFormat("            var {0} = templateState.{0};{1}", property.Name, NewLine);
 			}
 
-			Action<IEnumerable<string>> addCodeParts = delegate(IEnumerable<string> parts)
+			void AddCodeParts(IEnumerable<string> parts)
 			{
 				foreach (var part in parts)
 					if (part.StartsWith("<%=", StringComparison.Ordinal))
 					{
-						code.AppendFormat("            _GeneratedTemplateOutput.Append({0});{1}", part.Substring(3, part.Length - 5).Trim(), NewLine);
+						code.AppendFormat("            _GeneratedTemplateOutput.Append({0});{1}", 
+							part.Substring(3, part.Length - 5).Trim(), NewLine);
 					}
 					else if (part.StartsWith("<%+", StringComparison.Ordinal))
 					{
@@ -92,14 +98,14 @@ namespace NetCodeT
 						var literal = part.Replace("\"", "\"\"");
 						code.AppendFormat("            _GeneratedTemplateOutput.Append(@\"{0}\");{1}", literal, NewLine);
 					}
-			};
+			}
 
-			addCodeParts(codeParts.TakeWhile(p => !p.StartsWith("<%+", StringComparison.OrdinalIgnoreCase)));
+			AddCodeParts(codeParts.TakeWhile(p => !p.StartsWith("<%+", StringComparison.OrdinalIgnoreCase)));
 
 			code.Append("            return _GeneratedTemplateOutput.ToString();" + NewLine);
 			code.Append("        }" + NewLine);
 
-			addCodeParts(codeParts.SkipWhile(p => !p.StartsWith("<%+", StringComparison.OrdinalIgnoreCase)));
+			AddCodeParts(codeParts.SkipWhile(p => !p.StartsWith("<%+", StringComparison.OrdinalIgnoreCase)));
 
 			code.Append("    }" + NewLine);
 			code.Append("}");

@@ -16,7 +16,7 @@ namespace NetCodeT
 		/// <summary>
 		///   Gets the <see cref="Environment.NewLine" /> value, just to make code easier to write.
 		/// </summary>
-		protected string NewLine => Environment.NewLine;
+		protected static string NewLine => Environment.NewLine;
 
 		#region ITemplateLanguageHandler Members
 
@@ -85,14 +85,16 @@ namespace NetCodeT
 			var referencedAssemblies = new List<string>
 			{
 				"System.dll",
-				"NetCode-Template.dll",
+				typeof(TemplateLanguageHandlerBase).Assembly.GetName().Name + ".dll",
 				Path.GetFileName(parameterType.Assembly.Location)
 			};
 			referencedAssemblies.AddRange(assemblyReferences);
 
 			var parameters = new CompilerParameters();
 			foreach (var assemblyName in referencedAssemblies.Distinct())
+			{
 				parameters.ReferencedAssemblies.Add(assemblyName);
+			}
 
 			// Make local references absolute
 			var appPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -119,11 +121,11 @@ namespace NetCodeT
 
 			var assembly = results.CompiledAssembly;
 
-			foreach (var reference in parameters.ReferencedAssemblies)
-				if (Path.IsPathRooted(reference))
-				{
-					// heuristcally impossible
-				}
+//			foreach (var reference in parameters.ReferencedAssemblies)
+//				if (Path.IsPathRooted(reference))
+//				{
+//					// heuristcally impossible
+//				}
 
 			return assembly;
 		}

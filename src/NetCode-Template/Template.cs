@@ -106,39 +106,38 @@ namespace NetCodeT
 	///   }
 	/// </code>
 	/// </example>
-	[SuppressMessage("Microsoft.StyleCop.CSharp.DocumentationRules", "SA1644:DocumentationHeadersMustNotContainBlankLines", Justification = "Example scode")]
 	public class Template<T> : IDisposable
 	{
 		/// <summary>
 		///   The name of the parameter to pass to the template.
 		/// </summary>
-		private static string _ParameterName;
+		private static string _parameterName;
 
 		/// <summary>
 		///   Increasing number to give each <see cref="AppDomain" /> its own unique name.
 		/// </summary>
-		private static int _TemplateIndex;
+		private static int _templateIndex;
 
 		/// <summary>
 		///   This is the backing field for the <see cref="Content" /> property.
 		/// </summary>
-		private string _Content = string.Empty;
+		private string _content = string.Empty;
 
 		/// <summary>
 		///   This field holds a value indicating whether this <see cref="Template{T}" /> instance has been disposed.
 		/// </summary>
-		private bool _IsDisposed;
+		private bool _isDisposed;
 
 		/// <summary>
 		///   This field holds the <see cref="AppDomain" /> that will host the template code.
 		/// </summary>
-		private AppDomain _TemplateDomain;
+		private AppDomain _templateDomain;
 
 		/// <summary>
 		///   This <see cref="ITemplateProxy" /> object communicates with the <see cref="TemplateProxy" />
-		///   that is hosted in <see cref="_TemplateDomain" />.
+		///   that is hosted in <see cref="_templateDomain" />.
 		/// </summary>
-		private ITemplateProxy _TemplateProxy;
+		private ITemplateProxy _templateProxy;
 
 		/// <summary>
 		///   Initializes a new instance of the <see cref="Template&lt;T&gt;" /> class.
@@ -154,7 +153,7 @@ namespace NetCodeT
 			if (string.IsNullOrWhiteSpace(parameterName))
 				throw new ArgumentNullException(nameof(parameterName));
 
-			_ParameterName = parameterName;
+			_parameterName = parameterName;
 		}
 
 		/// <summary>
@@ -166,7 +165,7 @@ namespace NetCodeT
 		/// </remarks>
 		public Template()
 		{
-			_ParameterName = string.Empty;
+			_parameterName = string.Empty;
 		}
 
 		/// <summary>
@@ -182,7 +181,7 @@ namespace NetCodeT
 			get
 			{
 				AssertNotDisposed();
-				return _TemplateDomain != null;
+				return _templateDomain != null;
 			}
 		}
 
@@ -197,16 +196,16 @@ namespace NetCodeT
 			get
 			{
 				AssertNotDisposed();
-				return _Content;
+				return _content;
 			}
 
 			set
 			{
 				AssertNotDisposed();
-				if (value != _Content)
+				if (value != _content)
 				{
 					Invalidate();
-					_Content = (value ?? string.Empty).Trim();
+					_content = (value ?? string.Empty).Trim();
 				}
 			}
 		}
@@ -215,7 +214,7 @@ namespace NetCodeT
 		///   Gets the resulting code after transforming the template content into
 		///   code for compilation and execution.
 		/// </summary>
-		public string Code => _TemplateProxy.GetCode();
+		public string Code => _templateProxy.GetCode();
 
 		#region IDisposable Members
 
@@ -239,10 +238,10 @@ namespace NetCodeT
 		/// </param>
 		protected virtual void Dispose(bool disposing)
 		{
-			if (disposing && !_IsDisposed)
+			if (disposing && !_isDisposed)
 			{
 				Invalidate();
-				_IsDisposed = true;
+				_isDisposed = true;
 			}
 		}
 
@@ -254,7 +253,7 @@ namespace NetCodeT
 		/// </exception>
 		protected void AssertNotDisposed()
 		{
-			if (_IsDisposed)
+			if (_isDisposed)
 				throw new ObjectDisposedException(TypeHelper.TypeToString(GetType(), true));
 		}
 
@@ -278,10 +277,10 @@ namespace NetCodeT
 			if (!IsCompiled)
 				Compile();
 
-			Debug.Assert(_TemplateDomain != null, "no domain loaded, Compile should've failed");
-			Debug.Assert(_TemplateProxy != null, "no proxy loaded, Compile should've failed");
+			Debug.Assert(_templateDomain != null, "no domain loaded, Compile should've failed");
+			Debug.Assert(_templateProxy != null, "no proxy loaded, Compile should've failed");
 
-			return _TemplateProxy.Execute(parameterValue);
+			return _templateProxy.Execute(parameterValue);
 		}
 
 		/// <summary>
@@ -291,11 +290,11 @@ namespace NetCodeT
 		public void Invalidate()
 		{
 			AssertNotDisposed();
-			_TemplateProxy = null;
+			_templateProxy = null;
 
-			if (_TemplateDomain != null)
-				AppDomain.Unload(_TemplateDomain);
-			_TemplateDomain = null;
+			if (_templateDomain != null)
+				AppDomain.Unload(_templateDomain);
+			_templateDomain = null;
 		}
 
 		/// <summary>
@@ -323,9 +322,9 @@ namespace NetCodeT
 
 			try
 			{
-				var code = PreProcessCode(_Content, new HashSet<string>());
+				var code = PreProcessCode(_content, new HashSet<string>());
 				CreateDomain();
-				_TemplateProxy.Compile(code, LanguageHandlers.GetRegisteredHandlers(), typeof(T), _ParameterName);
+				_templateProxy.Compile(code, LanguageHandlers.GetRegisteredHandlers(), typeof(T), _parameterName);
 			}
 			catch (TemplateCompilerException ex)
 			{
@@ -357,10 +356,10 @@ namespace NetCodeT
 		/// <exception cref="ArgumentNullException">
 		///   <para><paramref name="content" /> is <c>null</c>.</para>
 		/// </exception>
-		private string PreProcessCode(string content, HashSet<string> inclusionStack)
+		private string PreProcessCode(string content, ISet<string> inclusionStack)
 		{
 			if (content == null)
-				throw new ArgumentNullException("content");
+				throw new ArgumentNullException(nameof(content));
 
 			var parser = new TemplateParser(content);
 			parser.Parse();
@@ -388,7 +387,11 @@ namespace NetCodeT
 						var includeEventArgs = new IncludeEventArgs(name);
 						OnInclude(includeEventArgs);
 						if (!includeEventArgs.Handled)
-							throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "Unable to include content named '{0}'", name));
+						{
+							throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, 
+								"Unable to include content named '{0}'", name));
+						}
+
 						inclusionStack.Add(name);
 						sb.Append(PreProcessCode(includeEventArgs.Content, inclusionStack));
 						inclusionStack.Remove(name);
@@ -411,11 +414,12 @@ namespace NetCodeT
 		/// </summary>
 		private void CreateDomain()
 		{
-			var templateDomainFriendlyName = "NetCodeT TemplateDomain #" + ++_TemplateIndex;
+			var templateDomainFriendlyName = string.Format("{0} TemplateDomain #{1}", TypeHelper.GetNamespace(), ++_templateIndex);
 			var setup = new AppDomainSetup { ApplicationBase = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) };
-			_TemplateDomain = AppDomain.CreateDomain(templateDomainFriendlyName, null, setup);
-			_TemplateProxy = (ITemplateProxy)_TemplateDomain.CreateInstanceAndUnwrap(Assembly.GetExecutingAssembly().FullName, 
-				"NetCodeT.TemplateProxy");
+			_templateDomain = AppDomain.CreateDomain(templateDomainFriendlyName, null, setup);
+			_templateProxy = 
+				(ITemplateProxy)_templateDomain.CreateInstanceAndUnwrap(
+					Assembly.GetExecutingAssembly().FullName, string.Format("{0}.TemplateProxy", TypeHelper.GetNamespace()));
 		}
 
 		/// <summary>
@@ -430,8 +434,7 @@ namespace NetCodeT
 		/// <param name="e">The <see cref="NetCodeT.IncludeEventArgs" /> instance containing the event data.</param>
 		protected virtual void OnInclude(IncludeEventArgs e)
 		{
-			if (Include != null)
-				Include(this, e);
+			Include?.Invoke(this, e);
 		}
 	}
 }

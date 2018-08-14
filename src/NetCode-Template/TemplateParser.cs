@@ -12,10 +12,10 @@ namespace NetCodeT
 	/// </summary>
 	internal class TemplateParser
 	{
-		private readonly List<string> _AssemblyReferences = new List<string>();
-		private readonly List<string> _NamespaceImports = new List<string>();
-		private readonly string _TemplateContent;
-		private List<string> _CodeParts = new List<string>();
+		private readonly List<string> _assemblyReferences = new List<string>();
+		private readonly List<string> _namespaceImports = new List<string>();
+		private readonly string _templateContent;
+		private List<string> _codeParts = new List<string>();
 
 		/// <summary>
 		///   Initializes a new instance of the <see cref="TemplateParser" /> class.
@@ -28,33 +28,29 @@ namespace NetCodeT
 		/// </exception>
 		public TemplateParser(string templateContent)
 		{
-			_TemplateContent = templateContent ?? throw new ArgumentNullException(nameof(templateContent));
+			_templateContent = templateContent ?? throw new ArgumentNullException(nameof(templateContent));
 		}
 
 		/// <summary>
 		///   Gets the language to override the template language with, or <c>null</c> if the
 		///   one specified by the <see cref="Template{T}" /> instance should be used.
 		/// </summary>
-		public string Language
-		{
-			get;
-			private set;
-		} = string.Empty;
+		public string Language { get; private set; } = string.Empty;
 
 		/// <summary>
 		///   Gets the collection of code parts from the template.
 		/// </summary>
-		public IEnumerable<string> CodeParts => _CodeParts;
+		public IEnumerable<string> CodeParts => _codeParts;
 
 		/// <summary>
 		///   Gets the collection of namespaces to import when compiling the template.
 		/// </summary>
-		public IEnumerable<string> NamespaceImports => _NamespaceImports;
+		public IEnumerable<string> NamespaceImports => _namespaceImports;
 
 		/// <summary>
 		///   Gets a collection of referenced assemblies.
 		/// </summary>
-		public IEnumerable<string> AssemblyReferences => _AssemblyReferences;
+		public IEnumerable<string> AssemblyReferences => _assemblyReferences;
 
 		/// <summary>
 		///   Parses the content of the template into separate parts.
@@ -66,7 +62,7 @@ namespace NetCodeT
 		{
 			var codeParts = new List<string>();
 
-			var tokenizer = new TemplateTokenizer(_TemplateContent);
+			var tokenizer = new TemplateTokenizer(_templateContent);
 			while (tokenizer.More)
 			{
 				var token = tokenizer.Peek();
@@ -97,10 +93,12 @@ namespace NetCodeT
 								break;
 
 							case TemplateTokenType.End:
-								throw new TemplateSyntaxException(string.Format(CultureInfo.InvariantCulture, "Code block that starts at position {0}, line {1}, does not complete", startToken.Position, startToken.LineNumber));
+								throw new TemplateSyntaxException(string.Format(CultureInfo.InvariantCulture, 
+									"Code block that starts at position {0}, line {1}, does not complete", startToken.Position, startToken.LineNumber));
 
 							default:
-								throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "Unsupported token from template parser: {0}", token));
+								throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, 
+									"Unsupported token from template parser: {0}", token));
 						}
 					}
 
@@ -133,7 +131,8 @@ namespace NetCodeT
 								break;
 
 							default:
-								throw new TemplateSyntaxException(string.Format(CultureInfo.InvariantCulture, "Unsupported token from template parser: {0}", token));
+								throw new TemplateSyntaxException(string.Format(CultureInfo.InvariantCulture, 
+									"Unsupported token from template parser: {0}", token));
 						}
 					}
 
@@ -148,6 +147,7 @@ namespace NetCodeT
 					part.StartsWith("<%@", StringComparison.Ordinal) &&
 					part.Substring(3, part.Length - 5).Trim().StartsWith("include ", StringComparison.OrdinalIgnoreCase)
 				select part;
+			
 			var directives =
 				from part in codeParts
 				where
@@ -161,7 +161,7 @@ namespace NetCodeT
 
 			imports.Add("System");
 			imports.Add("System.Text");
-			imports.Add("NetCodeT");
+			imports.Add(TypeHelper.GetNamespace());
 
 			foreach (var directive in directives)
 			{
@@ -213,16 +213,17 @@ namespace NetCodeT
 							break;
 					}
 				if (!directiveIsGood)
-					throw new TemplateSyntaxException(string.Format(CultureInfo.InvariantCulture, "Invalid directive found in template: {0}", directive));
+					throw new TemplateSyntaxException(string.Format(CultureInfo.InvariantCulture, 
+						"Invalid directive found in template: {0}", directive));
 			}
 
-			_NamespaceImports.Clear();
-			_NamespaceImports.AddRange(imports);
+			_namespaceImports.Clear();
+			_namespaceImports.AddRange(imports);
 
-			_AssemblyReferences.Clear();
-			_AssemblyReferences.AddRange(references);
+			_assemblyReferences.Clear();
+			_assemblyReferences.AddRange(references);
 
-			_CodeParts = new List<string>(statementBlocks);
+			_codeParts = new List<string>(statementBlocks);
 		}
 	}
 }

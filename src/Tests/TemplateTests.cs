@@ -14,24 +14,15 @@ namespace Tests.NetCodeT
 		[TestCase("")]
 		[TestCase(" \r\n\t ")]
 		public void Constructor_NullOrEmptyParameterName_ThrowsArgumentNullException(string input)
-		{
+		{	// ReSharper disable once ObjectCreationAsStatement
 			Assert.Throws<ArgumentNullException>(() => new Template<string>(input));
 		}
 
 		[Serializable]
 		private class ParameterClass
 		{
-			public string Name
-			{
-				get;
-				set;
-			}
-
-			public int Age
-			{
-				get;
-				set;
-			}
+			public string Name { get; set; }
+			public int Age { get; set; }
 		}
 
 		public void NoParameterName_MakesPropertiesOfParameterTypeAvailable_InCSharp()
@@ -190,6 +181,7 @@ Hello, <%= Name %>, happy <%= Age %>th birthday!"
 		}
 
 		[Test]
+		// ReSharper disable once UseNameofExpression
 		[TestCaseSource(typeof(TemplateTestSource), "TestCases")]
 		public void Execute_WithTestCases_ProducesCorrectOutput(string testName, string input, string expected)
 		{
@@ -334,11 +326,8 @@ End Sub
 		[Test]
 		public void ParameterNameSpecified_MakesParameterAvailableUnderThatName()
 		{
-			var template = new Template<string>("Name");
-			template.Content = "Hello, <%= Name %>!";
-
+			var template = new Template<string>("Name") {Content = "Hello, <%= Name %>!"};
 			var output = template.Execute("World");
-
 			Assert.That(output, Is.EqualTo("Hello, World!"));
 		}
 

@@ -7,7 +7,7 @@ namespace NetCodeT
 	///   This exception is the base for other exception types used in the templating engine.
 	/// </summary>
 	[Serializable]
-	public class TemplateException : Exception, ISerializable
+	public class TemplateException : Exception
 	{
 		/// <summary>
 		///   Initializes a new instance of the <see cref="TemplateException" /> class with serialized data.
@@ -40,7 +40,7 @@ namespace NetCodeT
 		///   The exception that is the cause of the current exception. If the innerException parameter is not a null reference
 		///   (Nothing in Visual Basic), the current exception is raised in a catch block that handles the inner exception.
 		/// </param>
-		public TemplateException(string message, Exception innerException)
+		protected TemplateException(string message, Exception innerException)
 			: base(message, innerException)
 		{
 		}
@@ -51,7 +51,7 @@ namespace NetCodeT
 		/// <param name="message">
 		///   The message that describes the error.
 		/// </param>
-		public TemplateException(string message)
+		protected TemplateException(string message)
 			: base(message)
 		{
 		}
@@ -59,7 +59,7 @@ namespace NetCodeT
 		/// <summary>
 		///   Initializes a new instance of the <see cref="TemplateException" /> class.
 		/// </summary>
-		public TemplateException()
+		protected TemplateException()
 		{
 		}
 	}

@@ -82,7 +82,8 @@ namespace NetCodeT
 		/// </returns>
 		public override string ToString()
 		{
-			return string.Format(CultureInfo.InvariantCulture, "Type: {0}, LineNumber: {1}, Position: {2}, Token: {3}", Type, LineNumber, Position, Token.Replace("\t", "\\t").Replace("\n", "\\n").Replace("\r", "\\r"));
+			return string.Format(CultureInfo.InvariantCulture, "Type: {0}, LineNumber: {1}, Position: {2}, Token: {3}", 
+				Type, LineNumber, Position, Token.Replace("\t", "\\t").Replace("\n", "\\n").Replace("\r", "\\r"));
 		}
 	}
 }

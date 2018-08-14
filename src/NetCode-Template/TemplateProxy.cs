@@ -13,8 +13,8 @@ namespace NetCodeT
 	[Serializable]
 	internal class TemplateProxy : MarshalByRefObject, ITemplateProxy
 	{
-		private Assembly _Assembly;
-		private string _Code;
+		private Assembly _assembly;
+		private string _code;
 
 		#region ITemplateProxy Members
 
@@ -62,7 +62,7 @@ namespace NetCodeT
 					"Language '{0}' is not supported as a template language", parser.Language));
 
 			var handler = (ITemplateLanguageHandler)Activator.CreateInstance(handlerType);
-			_Assembly = handler.RewriteAndCompile(parser.Language, parser.NamespaceImports, parser.AssemblyReferences, parser.CodeParts, parameterType, parameterName, out _Code);
+			_assembly = handler.RewriteAndCompile(parser.Language, parser.NamespaceImports, parser.AssemblyReferences, parser.CodeParts, parameterType, parameterName, out _code);
 		}
 
 		/// <summary>
@@ -76,7 +76,7 @@ namespace NetCodeT
 		/// </returns>
 		public string Execute(object templateState)
 		{
-			var templateInstance = _Assembly.CreateInstance("GeneratedNetCodeTemplateNamespace.GeneratedNetCodeTemplateClass");
+			var templateInstance = _assembly.CreateInstance("GeneratedNetCodeTemplateNamespace.GeneratedNetCodeTemplateClass");
 			var result = (string)templateInstance.GetType().GetMethod("ExecuteTemplateCode").Invoke(templateInstance, new[] { templateState });
 			return result ?? string.Empty;
 		}
@@ -87,7 +87,7 @@ namespace NetCodeT
 		/// <returns>The code that was compiled.</returns>
 		public string GetCode()
 		{
-			return _Code;
+			return _code;
 		}
 
 		#endregion

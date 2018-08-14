@@ -10,7 +10,7 @@ namespace NetCodeT
 	///   application domain.
 	/// </summary>
 	[Serializable]
-	public class TemplateCompilerException : TemplateException, ISerializable
+	public class TemplateCompilerException : TemplateException
 	{
 		/// <summary>
 		///   Initializes a new instance of the <see cref="TemplateCompilerException" /> class with serialized data.
@@ -55,7 +55,7 @@ namespace NetCodeT
 		/// <param name="message">
 		///   The message that describes the error.
 		/// </param>
-		public TemplateCompilerException(string message)
+		private TemplateCompilerException(string message)
 			: base(message)
 		{
 		}
@@ -80,13 +80,6 @@ namespace NetCodeT
 		}
 
 		/// <summary>
-		///   Initializes a new instance of the <see cref="TemplateCompilerException" /> class.
-		/// </summary>
-		public TemplateCompilerException()
-		{
-		}
-
-		/// <summary>
 		///   Gets the collection of errors produced when compiling the faulty template source code.
 		/// </summary>
 		/// <value>
@@ -104,10 +97,7 @@ namespace NetCodeT
 		/// <value>
 		///   The code from the template that contains the errors.
 		/// </value>
-		public string Code
-		{
-			get;
-		}
+		private string Code { get; }
 
 		#region ISerializable Members
 
