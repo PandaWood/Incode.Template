@@ -4,5 +4,5 @@ This is a continuation of Lasse V. Karlsen's texttemplate project on CodePlex (l
 Original URL http://texttemplate.codeplex.com/
 
 I've got it compiling and passing all tests (on mono too)...
-So it's probably good to go from here, but work to be done
+So it's probably good to go from here.
 
